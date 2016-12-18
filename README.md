@@ -14,7 +14,7 @@ Usage: the first six parameters are the calibration values we get from touch_XPT
 
 The Oak's version of SPI.cpp may be out of date, and may cause erroneous values. See more at http://www.ars-informatica.ca/eclectic/digistump-oak-with-a-touch-enabled-display-screen-circuit-and-code/. The entire project is described starting at http://www.ars-informatica.ca/eclectic/tutorial-digistump-oak-with-a-touch-enabled-display-screen/. 
 
-Three-point calibration has been implemented using Fang and Chang's [u]Calibration in touch-screen systems[/u], http://www.ti.com/lit/an/slyt277/slyt277.pdf, Analog Applications Journal, 2007.
+Three-point calibration has been implemented using Fang and Chang's _Calibration in touch-screen systems_, http://www.ti.com/lit/an/slyt277/slyt277.pdf, Analog Applications Journal, 2007.
 
 The modified software is released under the same conditions as the original. Feel free to modify, share, etc.
 
