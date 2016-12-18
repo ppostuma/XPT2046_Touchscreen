@@ -1,74 +1,22 @@
-# XPT2046 Touchscreen Arduino Library
+# Library: XPT2046 Touchscreen with Calibration
 
-XPT2046_Touchscreen is a library for the XPT2046 resistive touchscreen controllers used on many low cost TFT displays.
+XPT2046_Touchscreen_calibrated is a clone of Paul Stoffregen's excellent library for the XPT2046 touch controller at https://github.com/PaulStoffregen/XPT2046_Touchscreen. It adds a calibrate function to convert touch screen coordinates to pixel values. 
 
-![ILI9431Test Example Program](doc/ILI9431Test.jpg)
+![XPT2046 Touch Calibration](http://www.ars-informatica.ca/eclectic/wp-content/uploads/2016/12/touch-calibration2.jpg) ![XPT2046 Touch Calibration Parameters](http://www.ars-informatica.ca/eclectic/wp-content/uploads/2016/12/touch-calibration3.jpg)
 
-## Setup Functions
+Sample sketches are for the Digistump Oak. Both should be easily adapted to other Arduino-type processors. Sketch touch_XPT2046_digistump_oak.ino, as is, displays raw touch values. Uncomment the 
 
-First, create an instance of the library for your touchscreen.  The digital pin
-used for chip select is required.  The normal MISO, MOSI and SCK pins will be
-used automatically.
+    //  ts.calibrate(-.00114, -.0653, 254, -.0885, -.00125, 348, 320, 240, 1);
 
-    #define CS_PIN  8
-    XPT2046_Touchscreen ts(CS_PIN);
+line and it will now show pixel coordinates. The calibration parameters above are particular to my test screen, but may work with other screens using the ILI9341 and XPT2046 controllers.
 
-The use of the Touch interrupt pin can be optionally specified. If the Teensy
-pin specified is actively connected to the T_IRQ display pin then the normal
-touch calls will respond, but can be called more often as each call returns
-without hardware access when no interrupt was recorded.
+Usage: the first six parameters are the calibration values we get from touch_XPT2046_digistump_oak_calibration, and the next two are the screen width and height in the screen orientation you will be using. The final optional parameter sets the screen rotation; 0 gives the original unrotated orientation, 1 defines a 90 degree counter-clockwise rotation, 2 defines 180 degrees counter-clockwise, and 3 is 270 degrees. This matches most screens with most graphics libraries - but not all. Please check.
 
-    #define TIRQ_PIN  2
-    XPT2046_Touchscreen ts(CS_PIN, TIRQ_PIN);
+The Oak's version of SPI.cpp may be out of date, and may cause erroneous values. See more at http://www.ars-informatica.ca/eclectic/digistump-oak-with-a-touch-enabled-display-screen-circuit-and-code/. The entire project is described starting at http://www.ars-informatica.ca/eclectic/tutorial-digistump-oak-with-a-touch-enabled-display-screen/. 
 
-In setup(), use the begin function to initialize the touchscreen
+Three-point calibration has been implemented using Fang and Chang's [u]Calibration in touch-screen systems[/u], http://www.ti.com/lit/an/slyt277/slyt277.pdf, Analog Applications Journal, 2007.
 
-      ts.begin();
+The modified software is released under the same conditions as the original. Feel free to modify, share, etc.
 
-## Reading Touch Info
-
-The touched() function tells if the display is currently being touched,
-returning true or false.
-
-      if (ts.touched()) {
-        // do something....
-      }
-
-You can read the touch coordinates with readData()
-
-      uint16_t x, y, z;
-      ts.readData(&x, &y, &z);
-
-or with getPoint(), which returns a TS_Point object:
-
-      TS_Point p = ts.getPoint();
-      Serial.print("x = ");
-      Serial.print(p.x);
-      Serial.print(", y = ");
-      Serial.print(p.y);
-
-The Z coordinate represents the amount of pressure applied to the screen.
-
-## Adafruit Library Compatibility
-
-XPT2046_Touchscreen is meant to be a compatible with sketches written for Adafruit_STMPE610, offering the same functions, parameters and numerical ranges as Adafruit's library.
-
-## Using The Interrupt Pin : Built in support when connected nothing else is needed. When specified as above
-no SPI calls are made unless a Touch was detected.  On normal connections - this means the Teensy LED
-won't blink on every touch query.
-
-## Using The Interrupt Pin : Custom use would preclude the normal built in usage. The warning below is justified.
-
-The XPT2046 chip has an interrupt output, which is typically labeled T_IRQ on many low cost TFT displays.  No special software support is needed in this library.  The interrupt pin always outputs a digital signal related to the touch controller signals, which is LOW when the display is touched.  It also is driven low while software reads the touch position.
-
-The interrupt can be used as a wakeup signal, if you put your microcontroller into a deep sleep mode.  Normally, you would stop reading the touch data, then enable the interrupt pin with attachInterrupt(), and then configure your processor to wake when the interrupt occurs, before enter a deep sleep mode.  Upon waking, you would normally disable the interrupt before reading the display, to prevent false interrupts caused by the process of reading touch positions.
-
-You can also use the interrupt to respond to touch events.  Setup might look similar to this:
-
-      SPI.usingInterrupt(digitalPinToInterrupt(pin))
-      attachInterrupt(digitalPinToInterrupt(pin), myFunction, FALLING);
-
-However, inside your interrupt function, if the display is no longer being touched, any attempt to read the touch position will cause the interrupt pin to create another falling edge.  This can lead to an infinite loop of falsely triggered interrupts.  Special care is needed to avoid triggering more interrupts on the low signal due to reading the touch position.
-
-For most applications, regularly reading the touch position from the main program is much simpler.
+See Paul's original version for further documentation.
 
